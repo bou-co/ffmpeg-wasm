@@ -67,8 +67,8 @@ FLAGS=(
   -s MAXIMUM_MEMORY=4gb
   -s ENVIRONMENT=worker
   -s PROXY_TO_PTHREAD=1
-  -s STACK_SIZE=5MB                     # required since 3.1.27 (Uncaught Infinity runtime error)
-  -s DEFAULT_PTHREAD_STACK_SIZE=2MB     # required since 3.1.27 (Uncaught Infinity runtime error)
+  -s STACK_SIZE=5mb                     # required since 3.1.27 (Uncaught Infinity runtime error)
+  -s DEFAULT_PTHREAD_STACK_SIZE=2mb     # required since 3.1.27 (Uncaught Infinity runtime error)
   -o $OUTPUT_PATH
 )
 
