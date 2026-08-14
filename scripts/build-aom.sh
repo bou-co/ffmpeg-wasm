@@ -5,10 +5,30 @@ source $(dirname $0)/var.sh
 
 LIB_PATH=modules/aom
 CMBUILD_DIR=aom_build
+
+# aom is PINNED + PATCHED for wasm SIMD (see patches/aom-wasm-simd.patch):
+# x86-intrinsic kernels compile to wasm simd128 (~1.8x encode speedup,
+# byte-identical output); the patch drops nasm-only kernels to C via
+# rtcd and stubs inline-x86-asm headers. checkout -f makes this
+# idempotent and immune to 'submodule update --remote' moving the tree.
+AOM_PIN=03087864cf4bea6abb0d28f95cf7843511413d8f
+git -C $LIB_PATH fetch origin $AOM_PIN || true
+git -C $LIB_PATH checkout -f $AOM_PIN
+git -C $LIB_PATH apply "$(cd "$(dirname $0)/.." && pwd)/patches/aom-wasm-simd.patch"
 CM_FLAGS=(
   # common
   -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE        # use emscripten toolchain file
-  -DAOM_TARGET_CPU=generic
+  # wasm-simd: x86 target unlocks the SSE-intrinsic kernels, which
+  # emscripten translates to wasm simd128 (runs everywhere incl. ARM);
+  # ENABLE_WASM_SIMD gates local aom cmake patches that drop the nasm
+  # requirement (asm can't target wasm). x86 (not x86_64) matches
+  # wasm32 pointers and excludes the *_x86_64.asm-only kernels.
+  -DAOM_TARGET_CPU=x86
+  -DENABLE_WASM_SIMD=1
+  -DENABLE_SSE4_2=0
+  -DENABLE_AVX=0
+  -DENABLE_AVX2=1
+  -DCONFIG_AV1_HIGHBITDEPTH=0
   -DENABLE_DOCS=0
   -DENABLE_TESTS=0
   -DCONFIG_RUNTIME_CPU_DETECT=0
