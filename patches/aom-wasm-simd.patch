@@ -1,8 +1,16 @@
 diff --git a/aom_dsp/aom_dsp.cmake b/aom_dsp/aom_dsp.cmake
-index 0738274b1..ed3ff1d47 100644
+index 0738274b1..dd63d459d 100644
 --- a/aom_dsp/aom_dsp.cmake
 +++ b/aom_dsp/aom_dsp.cmake
-@@ -241,7 +241,6 @@ if(CONFIG_AV1_ENCODER)
+@@ -218,6 +218,7 @@ if(CONFIG_AV1_ENCODER)
+               "${AOM_ROOT}/aom_dsp/x86/ssim_sse2_x86_64.asm")
+ 
+   list(APPEND AOM_DSP_ENCODER_INTRIN_SSE2
++              "${AOM_ROOT}/aom_dsp/x86/sad_wasm_sse2.c"
+               "${AOM_ROOT}/aom_dsp/x86/avg_intrin_sse2.c"
+               "${AOM_ROOT}/aom_dsp/x86/fft_sse2.c"
+               "${AOM_ROOT}/aom_dsp/x86/fwd_txfm_impl_sse2.h"
+@@ -241,7 +242,6 @@ if(CONFIG_AV1_ENCODER)
                "${AOM_ROOT}/aom_dsp/x86/avg_intrin_avx2.c"
                "${AOM_ROOT}/aom_dsp/x86/fft_avx2.c"
                "${AOM_ROOT}/aom_dsp/x86/masked_sad_intrin_avx2.c"
@@ -11,7 +19,7 @@ index 0738274b1..ed3ff1d47 100644
                "${AOM_ROOT}/aom_dsp/x86/quantize_avx2.c"
                "${AOM_ROOT}/aom_dsp/x86/sad4d_avx2.c"
 diff --git a/aom_dsp/aom_dsp_rtcd_defs.pl b/aom_dsp/aom_dsp_rtcd_defs.pl
-index a3b356470..7524a0cb1 100755
+index a3b356470..c87003ada 100755
 --- a/aom_dsp/aom_dsp_rtcd_defs.pl
 +++ b/aom_dsp/aom_dsp_rtcd_defs.pl
 @@ -88,72 +88,72 @@ foreach (@tx_sizes) {
@@ -196,20 +204,20 @@ index a3b356470..7524a0cb1 100755
 +  specialize qw/aom_sad32x64      avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x32      avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x16      avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x32 neon neon_dotprod/;
-+  specialize qw/aom_sad16x16 neon neon_dotprod/;
-+  specialize qw/aom_sad16x8 neon neon_dotprod/;
-+  specialize qw/aom_sad8x16 neon/;
-+  specialize qw/aom_sad8x8 neon/;
-+  specialize qw/aom_sad8x4 neon/;
-+  specialize qw/aom_sad4x8 neon/;
-+  specialize qw/aom_sad4x4 neon/;
++  specialize qw/aom_sad16x32 neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x16 neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x8 neon neon_dotprod sse2/;
++  specialize qw/aom_sad8x16 neon sse2/;
++  specialize qw/aom_sad8x8 neon sse2/;
++  specialize qw/aom_sad8x4 neon sse2/;
++  specialize qw/aom_sad4x8 neon sse2/;
++  specialize qw/aom_sad4x4 neon sse2/;
 +
-+  specialize qw/aom_sad4x16 neon/;
-+  specialize qw/aom_sad16x4 neon neon_dotprod/;
-+  specialize qw/aom_sad8x32 neon/;
++  specialize qw/aom_sad4x16 neon sse2/;
++  specialize qw/aom_sad16x4 neon neon_dotprod sse2/;
++  specialize qw/aom_sad8x32 neon sse2/;
 +  specialize qw/aom_sad32x8 neon neon_dotprod/;
-+  specialize qw/aom_sad16x64 neon neon_dotprod/;
++  specialize qw/aom_sad16x64 neon neon_dotprod sse2/;
 +  specialize qw/aom_sad64x16 neon neon_dotprod/;
 +
 +  specialize qw/aom_sad_skip_128x128    avx2 neon neon_dotprod/;
@@ -232,19 +240,19 @@ index a3b356470..7524a0cb1 100755
 +  specialize qw/aom_sad_skip_32x64      avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad_skip_32x32      avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad_skip_32x16      avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_16x32 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_16x16 neon neon_dotprod/;
++  specialize qw/aom_sad_skip_16x32 neon neon_dotprod sse2/;
++  specialize qw/aom_sad_skip_16x16 neon neon_dotprod sse2/;
    specialize qw/aom_sad_skip_16x8            sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad_skip_8x16            sse2 neon/;
-+  specialize qw/aom_sad_skip_8x16 neon/;
++  specialize qw/aom_sad_skip_8x16 neon sse2/;
  
 -  specialize qw/aom_sad_skip_4x16            sse2 neon/;
 -  specialize qw/aom_sad_skip_8x32            sse2 neon/;
 -  specialize qw/aom_sad_skip_16x64           sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad_skip_64x16           sse2 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_4x16 neon/;
-+  specialize qw/aom_sad_skip_8x32 neon/;
-+  specialize qw/aom_sad_skip_16x64 neon neon_dotprod/;
++  specialize qw/aom_sad_skip_4x16 neon sse2/;
++  specialize qw/aom_sad_skip_8x32 neon sse2/;
++  specialize qw/aom_sad_skip_16x64 neon neon_dotprod sse2/;
 +  specialize qw/aom_sad_skip_64x16 neon neon_dotprod/;
  
 -  specialize qw/aom_sad128x128_avg avx2 sse2 neon neon_dotprod/;
@@ -275,19 +283,19 @@ index a3b356470..7524a0cb1 100755
 -  specialize qw/aom_sad8x8_avg          sse2 neon/;
 +  specialize qw/aom_sad32x32_avg   avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x16_avg   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x32_avg neon neon_dotprod/;
-+  specialize qw/aom_sad16x16_avg neon neon_dotprod/;
-+  specialize qw/aom_sad16x8_avg neon neon_dotprod/;
-+  specialize qw/aom_sad8x16_avg neon/;
-+  specialize qw/aom_sad8x8_avg neon/;
++  specialize qw/aom_sad16x32_avg neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x16_avg neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x8_avg neon neon_dotprod sse2/;
++  specialize qw/aom_sad8x16_avg neon sse2/;
++  specialize qw/aom_sad8x8_avg neon sse2/;
  
 -  specialize qw/aom_sad8x32_avg         sse2 neon/;
 -  specialize qw/aom_sad32x8_avg         sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad16x64_avg        sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad64x16_avg        sse2 neon neon_dotprod/;
-+  specialize qw/aom_sad8x32_avg neon/;
++  specialize qw/aom_sad8x32_avg neon sse2/;
 +  specialize qw/aom_sad32x8_avg neon neon_dotprod/;
-+  specialize qw/aom_sad16x64_avg neon neon_dotprod/;
++  specialize qw/aom_sad16x64_avg neon neon_dotprod sse2/;
 +  specialize qw/aom_sad64x16_avg neon neon_dotprod/;
  
    if (aom_config("CONFIG_AV1_HIGHBITDEPTH") eq "yes") {
@@ -345,22 +353,22 @@ index a3b356470..7524a0cb1 100755
 -  specialize qw/aom_sad_skip_32x16x4d   avx2 sse2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x32x4d   avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x16x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x32x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x16x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x8x4d    avx2 neon neon_dotprod/;
++  specialize qw/aom_sad16x32x4d   avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x16x4d   avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x8x4d    avx2 neon neon_dotprod sse2/;
 +
-+  specialize qw/aom_sad8x16x4d neon/;
-+  specialize qw/aom_sad8x8x4d neon/;
-+  specialize qw/aom_sad8x4x4d neon/;
-+  specialize qw/aom_sad4x8x4d neon/;
-+  specialize qw/aom_sad4x4x4d neon/;
++  specialize qw/aom_sad8x16x4d neon sse2/;
++  specialize qw/aom_sad8x8x4d neon sse2/;
++  specialize qw/aom_sad8x4x4d neon sse2/;
++  specialize qw/aom_sad4x8x4d neon sse2/;
++  specialize qw/aom_sad4x4x4d neon sse2/;
 +
 +  specialize qw/aom_sad64x16x4d   avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad32x8x4d    avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x64x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad16x4x4d    avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad8x32x4d neon/;
-+  specialize qw/aom_sad4x16x4d neon/;
++  specialize qw/aom_sad16x64x4d   avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad16x4x4d    avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad8x32x4d neon sse2/;
++  specialize qw/aom_sad4x16x4d neon sse2/;
 +
 +  specialize qw/aom_sad_skip_128x128x4d avx2 neon neon_dotprod/;
 +  specialize qw/aom_sad_skip_128x64x4d  avx2 neon neon_dotprod/;
@@ -381,16 +389,16 @@ index a3b356470..7524a0cb1 100755
 -  specialize qw/aom_sad_skip_16x64x4d   avx2 sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad_skip_16x32x4d   avx2 sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad_skip_16x16x4d   avx2 sse2 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_16x64x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_16x32x4d   avx2 neon neon_dotprod/;
-+  specialize qw/aom_sad_skip_16x16x4d   avx2 neon neon_dotprod/;
++  specialize qw/aom_sad_skip_16x64x4d   avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad_skip_16x32x4d   avx2 neon neon_dotprod sse2/;
++  specialize qw/aom_sad_skip_16x16x4d   avx2 neon neon_dotprod sse2/;
    specialize qw/aom_sad_skip_16x8x4d    avx2 sse2 neon neon_dotprod/;
 -  specialize qw/aom_sad_skip_8x32x4d         sse2 neon/;
 -  specialize qw/aom_sad_skip_8x16x4d         sse2 neon/;
 -  specialize qw/aom_sad_skip_4x16x4d         sse2 neon/;
-+  specialize qw/aom_sad_skip_8x32x4d neon/;
-+  specialize qw/aom_sad_skip_8x16x4d neon/;
-+  specialize qw/aom_sad_skip_4x16x4d neon/;
++  specialize qw/aom_sad_skip_8x32x4d neon sse2/;
++  specialize qw/aom_sad_skip_8x16x4d neon sse2/;
++  specialize qw/aom_sad_skip_4x16x4d neon sse2/;
  
    specialize qw/aom_sad128x128x3d avx2 neon neon_dotprod/;
    specialize qw/aom_sad128x64x3d  avx2 neon neon_dotprod/;
@@ -498,6 +506,128 @@ index a3b356470..7524a0cb1 100755
    }
  
    if (aom_config("CONFIG_AV1_HIGHBITDEPTH") eq "yes") {
+diff --git a/aom_dsp/x86/sad_wasm_sse2.c b/aom_dsp/x86/sad_wasm_sse2.c
+new file mode 100644
+index 000000000..5a9d2fe34
+--- /dev/null
++++ b/aom_dsp/x86/sad_wasm_sse2.c
+@@ -0,0 +1,116 @@
++/*
++ * wasm-simd port: SSE2-intrinsic SAD kernels for block widths <= 16.
++ *
++ * Upstream implements these in nasm assembly (sad_sse2.asm /
++ * sad4d_sse2.asm), which cannot target WebAssembly. The wider sizes
++ * (>= 32) are covered by the AVX2 intrinsics; these fill the gap so
++ * motion estimation's hottest loop runs as wasm simd128 instead of
++ * scalar C. All results are exact integer sums — bit-identical to the
++ * C reference.
++ */
++
++#include <emmintrin.h>
++#include <string.h>
++
++#include "config/aom_config.h"
++#include "aom/aom_integer.h"
++
++static inline __m128i load_row(const uint8_t *p, int width) {
++  if (width == 16) return _mm_loadu_si128((const __m128i *)p);
++  if (width == 8) return _mm_loadl_epi64((const __m128i *)p);
++  // width == 4: 32-bit load into the low lane, upper lanes zeroed
++  uint32_t v;
++  memcpy(&v, p, 4);
++  return _mm_cvtsi32_si128((int)v);
++}
++
++static inline unsigned int sad_wxh(const uint8_t *src, int ss,
++                                   const uint8_t *ref, int rs, int width,
++                                   int height) {
++  __m128i acc = _mm_setzero_si128();
++  for (int y = 0; y < height; y++) {
++    const __m128i s = load_row(src, width);
++    const __m128i r = load_row(ref, width);
++    acc = _mm_add_epi64(acc, _mm_sad_epu8(s, r));
++    src += ss;
++    ref += rs;
++  }
++  return (unsigned int)(_mm_cvtsi128_si32(acc) +
++                        _mm_cvtsi128_si32(_mm_srli_si128(acc, 8)));
++}
++
++static inline unsigned int sad_avg_wxh(const uint8_t *src, int ss,
++                                       const uint8_t *ref, int rs,
++                                       const uint8_t *pred, int width,
++                                       int height) {
++  __m128i acc = _mm_setzero_si128();
++  for (int y = 0; y < height; y++) {
++    const __m128i s = load_row(src, width);
++    // comp pred = ROUND_POWER_OF_TWO(ref + pred, 1) == pavgb, exact
++    const __m128i r = _mm_avg_epu8(load_row(ref, width), load_row(pred, width));
++    acc = _mm_add_epi64(acc, _mm_sad_epu8(s, r));
++    src += ss;
++    ref += rs;
++    pred += width;
++  }
++  return (unsigned int)(_mm_cvtsi128_si32(acc) +
++                        _mm_cvtsi128_si32(_mm_srli_si128(acc, 8)));
++}
++
++#define SAD_FUNCS(w, h)                                                       \
++  unsigned int aom_sad##w##x##h##_sse2(const uint8_t *src, int src_stride,    \
++                                       const uint8_t *ref, int ref_stride) {  \
++    return sad_wxh(src, src_stride, ref, ref_stride, w, h);                   \
++  }                                                                           \
++  unsigned int aom_sad##w##x##h##_avg_sse2(                                   \
++      const uint8_t *src, int src_stride, const uint8_t *ref,                 \
++      int ref_stride, const uint8_t *second_pred) {                           \
++    return sad_avg_wxh(src, src_stride, ref, ref_stride, second_pred, w, h);  \
++  }                                                                           \
++  void aom_sad##w##x##h##x4d_sse2(const uint8_t *src, int src_stride,         \
++                                  const uint8_t *const ref[4],                \
++                                  int ref_stride, uint32_t res[4]) {          \
++    for (int i = 0; i < 4; i++)                                               \
++      res[i] = sad_wxh(src, src_stride, ref[i], ref_stride, w, h);            \
++  }                                                                           \
++  void aom_sad##w##x##h##x3d_sse2(const uint8_t *src, int src_stride,         \
++                                  const uint8_t *const ref[4],                \
++                                  int ref_stride, uint32_t res[4]) {          \
++    for (int i = 0; i < 3; i++)                                               \
++      res[i] = sad_wxh(src, src_stride, ref[i], ref_stride, w, h);            \
++  }
++
++// skip variants: SAD over even rows only, doubled — defined for h >= 16
++#define SAD_SKIP_FUNCS(w, h)                                                  \
++  unsigned int aom_sad_skip_##w##x##h##_sse2(                                 \
++      const uint8_t *src, int src_stride, const uint8_t *ref,                 \
++      int ref_stride) {                                                       \
++    return 2 * sad_wxh(src, 2 * src_stride, ref, 2 * ref_stride, w, (h) / 2); \
++  }                                                                           \
++  void aom_sad_skip_##w##x##h##x4d_sse2(const uint8_t *src, int src_stride,   \
++                                        const uint8_t *const ref[4],          \
++                                        int ref_stride, uint32_t res[4]) {    \
++    for (int i = 0; i < 4; i++)                                               \
++      res[i] = 2 * sad_wxh(src, 2 * src_stride, ref[i], 2 * ref_stride, w,    \
++                           (h) / 2);                                          \
++  }
++
++SAD_FUNCS(4, 4)
++SAD_FUNCS(4, 8)
++SAD_FUNCS(4, 16)
++SAD_FUNCS(8, 4)
++SAD_FUNCS(8, 8)
++SAD_FUNCS(8, 16)
++SAD_FUNCS(8, 32)
++SAD_FUNCS(16, 4)
++SAD_FUNCS(16, 8)
++SAD_FUNCS(16, 16)
++SAD_FUNCS(16, 32)
++SAD_FUNCS(16, 64)
++
++SAD_SKIP_FUNCS(4, 16)
++SAD_SKIP_FUNCS(8, 16)
++SAD_SKIP_FUNCS(8, 32)
++SAD_SKIP_FUNCS(16, 16)
++SAD_SKIP_FUNCS(16, 32)
++SAD_SKIP_FUNCS(16, 64)
 diff --git a/aom_ports/x86.h b/aom_ports/x86.h
 index 4d00d7241..e8d152263 100644
 --- a/aom_ports/x86.h

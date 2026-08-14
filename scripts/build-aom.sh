@@ -14,6 +14,9 @@ CMBUILD_DIR=aom_build
 AOM_PIN=03087864cf4bea6abb0d28f95cf7843511413d8f
 git -C $LIB_PATH fetch origin $AOM_PIN || true
 git -C $LIB_PATH checkout -f $AOM_PIN
+# the patch also CREATES files; drop untracked leftovers from previous
+# applies or git apply refuses ("already exists")
+git -C $LIB_PATH clean -fd -- aom_dsp aom_ports cmake
 git -C $LIB_PATH apply "$(cd "$(dirname $0)/.." && pwd)/patches/aom-wasm-simd.patch"
 CM_FLAGS=(
   # common
