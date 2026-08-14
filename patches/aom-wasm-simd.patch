@@ -1,5 +1,17 @@
+diff --git a/aom_dsp/aom_dsp.cmake b/aom_dsp/aom_dsp.cmake
+index 0738274b1..ed3ff1d47 100644
+--- a/aom_dsp/aom_dsp.cmake
++++ b/aom_dsp/aom_dsp.cmake
+@@ -241,7 +241,6 @@ if(CONFIG_AV1_ENCODER)
+               "${AOM_ROOT}/aom_dsp/x86/avg_intrin_avx2.c"
+               "${AOM_ROOT}/aom_dsp/x86/fft_avx2.c"
+               "${AOM_ROOT}/aom_dsp/x86/masked_sad_intrin_avx2.c"
+-              "${AOM_ROOT}/aom_dsp/x86/subtract_avx2.c"
+               "${AOM_ROOT}/aom_dsp/x86/adaptive_quantize_avx2.c"
+               "${AOM_ROOT}/aom_dsp/x86/quantize_avx2.c"
+               "${AOM_ROOT}/aom_dsp/x86/sad4d_avx2.c"
 diff --git a/aom_dsp/aom_dsp_rtcd_defs.pl b/aom_dsp/aom_dsp_rtcd_defs.pl
-index a3b356470..f79d5fb6d 100755
+index a3b356470..7524a0cb1 100755
 --- a/aom_dsp/aom_dsp_rtcd_defs.pl
 +++ b/aom_dsp/aom_dsp_rtcd_defs.pl
 @@ -88,72 +88,72 @@ foreach (@tx_sizes) {
@@ -132,7 +144,7 @@ index a3b356470..f79d5fb6d 100755
    #
    add_proto qw/void aom_subtract_block/, "int rows, int cols, int16_t *diff_ptr, ptrdiff_t diff_stride, const uint8_t *src_ptr, ptrdiff_t src_stride, const uint8_t *pred_ptr, ptrdiff_t pred_stride";
 -  specialize qw/aom_subtract_block neon sse2 avx2/;
-+  specialize qw/aom_subtract_block neon avx2/;
++  specialize qw/aom_subtract_block neon/;
  
    add_proto qw/int64_t/, "aom_sse", "const uint8_t *a, int a_stride, const uint8_t *b,int b_stride, int width, int height";
    specialize qw/aom_sse sse4_1 avx2 neon neon_dotprod/;
@@ -568,3 +580,20 @@ index c939ea7d0..e9c9be5ba 100644
    if("${${asm_sources}}" STREQUAL "")
      return()
    endif()
+diff --git a/cmake/cpu.cmake b/cmake/cpu.cmake
+index daa597689..624d159f6 100644
+--- a/cmake/cpu.cmake
++++ b/cmake/cpu.cmake
+@@ -121,7 +121,11 @@ elseif("${AOM_TARGET_CPU}" MATCHES "^x86")
+     if("${flavor}" STREQUAL "AVX512" AND "${AOM_TARGET_CPU}" STREQUAL "x86")
+       continue()
+     endif()
+-    if(ENABLE_${flavor} AND NOT disable_remaining_flavors)
++    if(ENABLE_${flavor} AND (ENABLE_WASM_SIMD OR NOT disable_remaining_flavors))
++      # wasm-simd port: flavors are independent — emscripten supports
++      # SSE2..SSE4.1 and AVX2 but not SSE4.2's CRC32 instructions, so
++      # the strict "first disabled kills the rest" cascade would ban
++      # AVX2 just because SSE4.2 must stay off.
+       set(HAVE_${flavor} 1)
+     else()
+       set(disable_remaining_flavors 1)
