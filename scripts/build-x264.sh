@@ -12,7 +12,8 @@ LIB_PATH=modules/x264
 # Do not bump without re-verifying multithreaded h264 in the browser.
 X264_PIN=64f6a907b60fed93b49285a6cd19a90d1f0d009c
 git -C $LIB_PATH fetch origin $X264_PIN || true
-git -C $LIB_PATH checkout $X264_PIN
+git -C $LIB_PATH checkout -f $X264_PIN
+git -C $LIB_PATH apply "$(cd "$(dirname $0)/.." && pwd)/patches/x264-wasm-threads.patch"
 CONF_FLAGS=(
   --prefix=$BUILD_DIR           # install library in a build directory for FFmpeg to include
   --host=i686-gnu               # use i686 linux

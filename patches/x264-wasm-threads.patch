@@ -1,0 +1,44 @@
+diff --git a/common/cpu.c b/common/cpu.c
+index acf4fec5..266edcdb 100644
+--- a/common/cpu.c
++++ b/common/cpu.c
+@@ -471,10 +471,11 @@ int x264_cpu_num_processors( void )
+ 
+ #else
+     /*
+-     * ffmpeg.wasm: manually set the number of 
+-     * processor as it cannot be detected in 
+-     * emscripten environment.
++     * ffmpeg.wasm: modern emscripten reports the real core count via
++     * sysconf (navigator.hardwareConcurrency); the historical
++     * hardcoded 4 remains the fallback if detection fails.
+      */
+-    return 4;
++    long ncpu = sysconf( _SC_NPROCESSORS_ONLN );
++    return ncpu > 0 ? (int)ncpu : 4;
+ #endif
+ }
+diff --git a/encoder/slicetype.c b/encoder/slicetype.c
+index 0315ba6b..9e9dcd5c 100644
+--- a/encoder/slicetype.c
++++ b/encoder/slicetype.c
+@@ -811,7 +811,10 @@ typedef struct
+     int *output_intra;
+ } x264_slicetype_slice_t;
+ 
+-static void slicetype_slice_cost( x264_slicetype_slice_t *s )
++/* wasm: must return void* — this function is dispatched through
++ * x264_threadpool_run as void *(*)(void *); a void return makes the
++ * indirect call's wasm signature mismatch and trap at runtime. */
++static void *slicetype_slice_cost( x264_slicetype_slice_t *s )
+ {
+     x264_t *h = s->h;
+ 
+@@ -831,6 +834,7 @@ static void slicetype_slice_cost( x264_slicetype_slice_t *s )
+         for( h->mb.i_mb_x = start_x; h->mb.i_mb_x >= end_x; h->mb.i_mb_x-- )
+             slicetype_mb_cost( h, s->a, s->frames, s->p0, s->p1, s->b, s->dist_scale_factor,
+                                s->do_search, s->w, s->output_inter, s->output_intra );
++    return NULL;
+ }
+ 
+ static int slicetype_frame_cost( x264_t *h, x264_mb_analysis_t *a,
