@@ -9,6 +9,7 @@ source $SCRIPT_ROOT/init-emscripten.sh
 if [ "$FFMPEG_SKIP_LIBS" = false ] ; then
     $SCRIPT_ROOT/build-zlib.sh
     $SCRIPT_ROOT/build-aom.sh
+    $SCRIPT_ROOT/build-dav1d.sh
     $SCRIPT_ROOT/build-lame.sh
     $SCRIPT_ROOT/build-libjxl.sh
     $SCRIPT_ROOT/build-libvpx.sh

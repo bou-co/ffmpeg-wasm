@@ -103,3 +103,8 @@
 	url = https://github.com/wide-video/zlib
 	branch = wide.video
 	ignore = all
+[submodule "modules/dav1d"]
+	path = modules/dav1d
+	url = https://code.videolan.org/videolan/dav1d.git
+	branch = master
+	ignore = all

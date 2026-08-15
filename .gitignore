@@ -3,3 +3,4 @@
 /modules
 /wasm
 .DS_Store
+/.toolvenv

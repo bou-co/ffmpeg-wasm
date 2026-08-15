@@ -13,6 +13,7 @@ FLAGS=(
   --enable-version3
   --enable-zlib
   --enable-libaom
+  --enable-libdav1d
   --enable-libjxl
   --enable-libopenh264
   --enable-libkvazaar
@@ -34,7 +35,7 @@ FLAGS=(
   --extra-cflags="$CFLAGS"
   --extra-cxxflags="$CXXFLAGS"
   --extra-ldflags="$LDFLAGS"
-  --pkg-config-flags="--static"
+  --pkg-config-flags="--static --define-prefix"
   --nm=emnm
   --ar=emar
   --ranlib=emranlib
