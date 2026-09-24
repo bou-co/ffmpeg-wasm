@@ -38,7 +38,13 @@ FLAGS=(
   # buffer/abuffer sources and sinks are always compiled -- allfilters.c
   # deliberately hides them from configure's grep, so naming them here
   # would be rejected as an unknown option.
-  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim
+  #
+  # Edit mode's sequence export (src/ffmpeg/job/composition-args.ts) adds
+  # its own set: color (the background clock), setsar, overlay and
+  # colorchannelmixer (layering and opacity), and on the audio side
+  # adelay, afade, volume, amix and apad (placement, fades, levels, the
+  # mix and padding it to the sequence length).
+  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad
   # aom is built encoder-only now (dav1d decodes av1 and ffmpeg prefers
   # it), so the libaom decoder wrapper has no library behind it
   --disable-decoder=libaom_av1
