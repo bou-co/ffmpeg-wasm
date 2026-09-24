@@ -6,6 +6,15 @@ set -euo pipefail
 export PATH=$PATH:$EMSDK/upstream/bin
 
 ROOT_DIR=$PWD
+
+# The repo-local venv supplies pkgconf (as pkg-config), cmake, meson and
+# ninja. Nothing here is guaranteed to exist system-wide -- this host has
+# neither cmake nor pkg-config installed, and ffmpeg's configure fails at
+# "aom >= 2.0.0 not found using pkg-config" without it. build-dav1d.sh
+# already did this for meson; doing it here covers every script.
+if [ -d "$ROOT_DIR/.toolvenv/bin" ]; then
+    export PATH="$ROOT_DIR/.toolvenv/bin:$PATH"
+fi
 WASM_DIR=$ROOT_DIR/wasm
 BUILD_DIR=$ROOT_DIR/build
 EM_PKG_CONFIG_PATH=$BUILD_DIR/lib/pkgconfig

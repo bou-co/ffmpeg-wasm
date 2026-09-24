@@ -20,6 +20,8 @@ CONF_FLAGS=(
   --enable-static               # enable building static library
   --disable-cli                 # disable cli tools
   --disable-asm                 # disable asm optimization
+  --bit-depth=8                 # 8-bit only: every encode is -pix_fmt yuv420p,
+                                # so the 10-bit half of the lib is unreachable
   --extra-cflags="$CFLAGS"      # flags to use pthread and code optimization
 )
 echo "CONF_FLAGS=${CONF_FLAGS[@]}"

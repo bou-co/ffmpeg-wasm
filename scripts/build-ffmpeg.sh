@@ -29,18 +29,8 @@ FLAGS=(
   -laom
   -ldav1d
   -lSvtAv1Enc -LSvtAv1Enc -Llibstvav1
-  -lopenh264
-  -lkvazaar
-  -lvpx
-  -lmp3lame
-  -lvorbis -lvorbisenc -lvorbisfile
-  -logg
-  -ltheora -ltheoraenc -ltheoradec
   -lz
-  -lopus
-  -lwebp -lwebpmux -lsharpyuv
-  -lrubberband -lsamplerate -Lrubberband -Lsamplerate
-  -ljxl -ljxl_cms -ljxl_threads -lhwy -lbrotlienc -lbrotlidec -lbrotlicommon
+  -lwebp -lsharpyuv
   -lzimg
 
   # Goes after `-l -L` switches see: https://gitlab.com/AOMediaCodec/SVT-AV1/-/issues/2052
@@ -49,7 +39,6 @@ FLAGS=(
 
   # Emscripten
   -lworkerfs.js
-  -s USE_SDL=2
   -s WASM_BIGINT
   -s MALLOC=emmalloc                   # available since 3.1.50
 #  -s EXPORT_ES6=1                     # https://github.com/emscripten-core/emscripten/issues/22508

@@ -32,6 +32,9 @@ CM_FLAGS=(
   -DENABLE_AVX=0
   -DENABLE_AVX2=1
   -DCONFIG_AV1_HIGHBITDEPTH=0
+  # dav1d is the av1 decoder (see build-dav1d.sh) -- aom ships only the
+  # encoder here, paired with ffmpeg --disable-decoder=libaom_av1
+  -DCONFIG_AV1_DECODER=0
   -DENABLE_DOCS=0
   -DENABLE_TESTS=0
   -DCONFIG_RUNTIME_CPU_DETECT=0
