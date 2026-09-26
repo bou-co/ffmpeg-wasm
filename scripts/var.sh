@@ -16,19 +16,37 @@ if [ -d "$ROOT_DIR/.toolvenv/bin" ]; then
     export PATH="$ROOT_DIR/.toolvenv/bin:$PATH"
 fi
 WASM_DIR=$ROOT_DIR/wasm
-BUILD_DIR=$ROOT_DIR/build
+
+# FFMPEG_WASM64=true builds the memory64 engine (ffmpeg-gpl-mem64), whose
+# heap can grow past the 4 GiB wasm32 ceiling. Every library has to be
+# compiled with -m64 as well, so the variant gets its own install prefix
+# (build64) and the wasm32 libraries in build/ are left untouched.
+FFMPEG_WASM64=${FFMPEG_WASM64:-false}
+if [ "$FFMPEG_WASM64" = true ] ; then
+    BUILD_DIR=$ROOT_DIR/build64
+    WASM_ARCH=wasm64
+else
+    BUILD_DIR=$ROOT_DIR/build
+    WASM_ARCH=wasm32
+fi
 EM_PKG_CONFIG_PATH=$BUILD_DIR/lib/pkgconfig
 TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
 # `-Og` -> no optimization
 # `-g` -> debug info enabled
 CFLAGS="-O3 -flto -I$BUILD_DIR/include -pthread -msimd128 -mavx2"
+if [ "$FFMPEG_WASM64" = true ] ; then
+    CFLAGS="$CFLAGS -m64"
+fi
 
 OUTPUT_FILENAME="ffmpeg"
 if [ "$FFMPEG_LGPL" = true ] ; then
     OUTPUT_FILENAME="$OUTPUT_FILENAME-lgpl"
 else
     OUTPUT_FILENAME="$OUTPUT_FILENAME-gpl"
+fi
+if [ "$FFMPEG_WASM64" = true ] ; then
+    OUTPUT_FILENAME="$OUTPUT_FILENAME-mem64"
 fi
 OUTPUT_PATH=$WASM_DIR/$OUTPUT_FILENAME.js
 OUTPUT_PATH_WV=$WASM_DIR/$OUTPUT_FILENAME-wv.js

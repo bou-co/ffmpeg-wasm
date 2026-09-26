@@ -25,6 +25,7 @@ Release script further executes configuration and build of each submodule, which
 sudo -s
 export FFMPEG_LGPL=true                  # release.sh
 export FFMPEG_SKIP_LIBS=false            # release.sh
+export FFMPEG_WASM64=true                # optional; release.sh sets it for its last pass: memory64 engine (ffmpeg-gpl-mem64), libs in ./build64
 ./scripts/clean.sh                       # release.sh
 ./scripts/build.sh                       # release.sh
 	source scripts/init-emscripten.sh    # build.sh

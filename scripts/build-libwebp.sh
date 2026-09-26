@@ -25,6 +25,9 @@ CM_FLAGS=(
 echo "CM_FLAGS=${CM_FLAGS[@]}"
 
 cd $LIB_PATH
+# a fresh tree: cmake caches try-compile results (the pointer size among
+# them) and would keep the other variant's answers
+rm -rf build
 mkdir -p build
 cd build
 

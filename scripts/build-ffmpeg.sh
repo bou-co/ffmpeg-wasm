@@ -8,6 +8,25 @@ INFO_FILE=$WASM_DIR/$OUTPUT_FILENAME.txt
 
 mkdir -p $WASM_DIR
 
+# memory64 raises the heap ceiling from 4 GiB to 16 GiB and uses dlmalloc
+# (the 2026-09-25 mem64 engine was built and measured that way)
+if [ "$FFMPEG_WASM64" = true ] ; then
+    MALLOC=dlmalloc
+    MAXIMUM_MEMORY=16gb
+else
+    MALLOC=emmalloc
+    MAXIMUM_MEMORY=4gb
+fi
+
+# ffmpeg builds in-tree, so objects compiled for the other variant (-m64 or
+# not) would be linked in as-is. Start clean whenever the variant changes.
+VARIANT_STAMP=$LIB_PATH/.wasm-variant
+if [ "$(cat $VARIANT_STAMP 2>/dev/null)" != "$WASM_ARCH" ] ; then
+    # make clean misses nested arch dirs (libavcodec/wasm/hevc/*.o survives
+    # it), so sweep every object as well
+    (cd $LIB_PATH && emmake make clean && find . -name "*.o" -delete)
+fi
+
 # In ffmpeg 8.0.0, fftools/resources/resman.c expects `extenrn const ...` made out of .css and .html files.
 # Not usre if this is needed for wasm runtime, but I can not figure out way to remove it in build time.
 # AI suggested to use xxd
@@ -40,7 +59,7 @@ FLAGS=(
   # Emscripten
   -lworkerfs.js
   -s WASM_BIGINT
-  -s MALLOC=emmalloc                   # available since 3.1.50
+  -s MALLOC=$MALLOC                     # emmalloc available since 3.1.50
 #  -s EXPORT_ES6=1                     # https://github.com/emscripten-core/emscripten/issues/22508
 #  -s STRICT=1                         # 3.1.65 wasm-ld: error: lto.tmp: undefined symbol: __syscall_geteuid32
   -s INVOKE_RUN=0
@@ -54,7 +73,7 @@ FLAGS=(
   -s INCOMING_MODULE_JS_API="[locateFile, mainScriptUrlOrBlob, onExit, printErr, stderr, stdin, stdout, wasmMemory]"
   -s INITIAL_MEMORY=96mb
   -s ALLOW_MEMORY_GROWTH=1
-  -s MAXIMUM_MEMORY=4gb
+  -s MAXIMUM_MEMORY=$MAXIMUM_MEMORY
   -s ENVIRONMENT=worker
   -s PROXY_TO_PTHREAD=1
   -s STACK_SIZE=5mb                     # required since 3.1.27 (Uncaught Infinity runtime error)
@@ -74,6 +93,7 @@ echo "FFMPEG_EM_FLAGS=${FLAGS[@]}"
 (cd $LIB_PATH && \
     emmake make -j$(nproc) && \
     emcc "${FLAGS[@]}")
+echo $WASM_ARCH > $VARIANT_STAMP
 
 echo "emcc ${FLAGS[@]}" > $INFO_FILE
 echo "" >> $INFO_FILE

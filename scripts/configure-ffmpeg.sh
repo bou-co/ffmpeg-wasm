@@ -7,7 +7,7 @@ LIB_PATH=modules/ffmpeg
 
 FLAGS=(
   --target-os=none        # use none to prevent any os specific configurations
-  --arch=wasm32
+  --arch=$WASM_ARCH
   --cpu=generic
   --enable-cross-compile
   --enable-version3
@@ -43,8 +43,9 @@ FLAGS=(
   # its own set: color (the background clock), setsar, overlay and
   # colorchannelmixer (layering and opacity), and on the audio side
   # adelay, afade, volume, amix and apad (placement, fades, levels, the
-  # mix and padding it to the sequence length).
-  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad
+  # mix and padding it to the sequence length), plus fade for picture
+  # fades (it ramps the alpha of an rgba clip, revealing what is below).
+  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad,fade,chromakey,despill
   # aom is built encoder-only now (dav1d decodes av1 and ffmpeg prefers
   # it), so the libaom decoder wrapper has no library behind it
   --disable-decoder=libaom_av1
@@ -79,5 +80,5 @@ fi
 
 echo "FFMPEG_CONFIG_FLAGS=${FLAGS[@]}"
 (cd $LIB_PATH && \
-    PKG_CONFIG_PATH=$PWD/build/lib/pkgconfig && \
+    PKG_CONFIG_PATH=$EM_PKG_CONFIG_PATH && \
     emconfigure ./configure "${FLAGS[@]}")

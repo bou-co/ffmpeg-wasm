@@ -24,6 +24,11 @@ CONF_FLAGS=(
                                 # so the 10-bit half of the lib is unreachable
   --extra-cflags="$CFLAGS"      # flags to use pthread and code optimization
 )
+# --host=i686 makes configure prepend -m32 to CFLAGS and LDFLAGS. The -m64
+# in $CFLAGS comes after it and wins for compiles; this restores it for links.
+if [ "$FFMPEG_WASM64" = true ] ; then
+    CONF_FLAGS+=(--extra-ldflags="-m64")
+fi
 echo "CONF_FLAGS=${CONF_FLAGS[@]}"
 (cd $LIB_PATH && emconfigure ./configure "${CONF_FLAGS[@]}")
 emmake make -C $LIB_PATH clean

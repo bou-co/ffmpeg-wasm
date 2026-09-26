@@ -42,8 +42,8 @@ c_link_args = [$MESON_C_ARGS]
 
 [host_machine]
 system = 'emscripten'
-cpu_family = 'wasm32'
-cpu = 'wasm32'
+cpu_family = '$WASM_ARCH'
+cpu = '$WASM_ARCH'
 endian = 'little'
 EOF
 
