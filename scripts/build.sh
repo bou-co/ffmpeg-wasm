@@ -13,6 +13,7 @@ if [ "$FFMPEG_SKIP_LIBS" = false ] ; then
     $SCRIPT_ROOT/build-libwebp.sh
     $SCRIPT_ROOT/build-svtav1.sh
     $SCRIPT_ROOT/build-zimg.sh
+    $SCRIPT_ROOT/build-libvpx.sh
 
     # GPL
     $SCRIPT_ROOT/build-x264.sh

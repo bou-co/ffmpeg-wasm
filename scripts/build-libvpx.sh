@@ -20,12 +20,13 @@ CONF_FLAGS=(
   --disable-runtime-cpu-detect                       # make sure libvpx’s configure doesn’t disable SIMD
   --enable-multithread                               # not sure if needed, but seen used around the internets
 
-  # https://github.com/wide-video/libvpx/blob/wide.video/test/vp9_c_vs_simd_encode.sh#L234
-  # fixes yuv420p10le pixel format
-  --enable-postproc
-  --enable-vp9-postproc
-  --enable-vp9-temporal-denoising
-  --enable-vp9-highbitdepth
+  # The app only ENCODES vp9, and only 8-bit yuva420p (Edit mode's
+  # transparent WebM export): ffmpeg's native vp9 decoder handles every
+  # upload, so the decoders, vp8 and the high-bit-depth paths are dead
+  # weight in the wasm.
+  --disable-vp8
+  --disable-vp9-decoder
+  --disable-vp9-highbitdepth
 
   # https://github.com/emscripten-core/emscripten/issues/22524
   # disables `-flto`

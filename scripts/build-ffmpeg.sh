@@ -51,6 +51,7 @@ FLAGS=(
   -lz
   -lwebp -lsharpyuv
   -lzimg
+  -lvpx
 
   # Goes after `-l -L` switches see: https://gitlab.com/AOMediaCodec/SVT-AV1/-/issues/2052
   # there used to be `fftools/ffmpeg.c fftools/ffmpeg_dec.c ...` but the list wen too long already

@@ -17,6 +17,7 @@ FLAGS=(
   --enable-libwebp
   --enable-libsvtav1
   --enable-libzimg
+  --enable-libvpx
 
   # Component pruning. The app drives a FIXED set of encoders, muxers and
   # filters (src/ffmpeg/job/args.ts is the only place that builds an ffmpeg
@@ -27,9 +28,9 @@ FLAGS=(
   # DECODERS, DEMUXERS, PARSERS and BSFs stay fully enabled on purpose --
   # uploads are arbitrary, so breadth on the decode side is worth its bytes.
   --disable-encoders
-  --enable-encoder=aac,png,libwebp,libx264,libx265,libaom_av1,libsvtav1
+  --enable-encoder=aac,png,libwebp,libx264,libx265,libaom_av1,libsvtav1,libvpx_vp9,opus
   --disable-muxers
-  --enable-muxer=mp4,mov,image2
+  --enable-muxer=mp4,mov,image2,webm
   --disable-filters
   # named by videoFilters()/audioTrimFilter(): setparams select setpts crop
   # scale zscale format tonemap fps aselect asetpts. The rest are inserted
@@ -52,10 +53,18 @@ FLAGS=(
   # configure normally selects them for the ffmpeg program, but this build
   # uses --disable-programs and compiles fftools by hand, so they must be
   # named here.
-  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad,fade,chromakey,despill,transpose,hflip,vflip,rotate
+  #
+  # Transparent export and masks: lutrgb (a mask clip's picture made grey
+  # or white, and inverted), shuffleplanes (copies that grey into the
+  # alpha plane) and blend (multiplies the composite's alpha by it). The
+  # alpha itself leaves as vp9 yuva420p in webm, with ffmpeg's native opus
+  # encoder for the sound (webm cannot carry aac).
+  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad,fade,chromakey,despill,transpose,hflip,vflip,rotate,lutrgb,shuffleplanes,blend
   # aom is built encoder-only now (dav1d decodes av1 and ffmpeg prefers
   # it), so the libaom decoder wrapper has no library behind it
   --disable-decoder=libaom_av1
+  # libvpx is built encoder-only too; the native vp8/vp9 decoders stay
+  --disable-decoder=libvpx_vp8,libvpx_vp9
   # no protocol other than file/pipe can work in wasm anyway
   --disable-network
   --disable-stripping
