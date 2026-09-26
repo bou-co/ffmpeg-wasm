@@ -45,7 +45,14 @@ FLAGS=(
   # adelay, afade, volume, amix and apad (placement, fades, levels, the
   # mix and padding it to the sequence length), plus fade for picture
   # fades (it ramps the alpha of an rgba clip, revealing what is below).
-  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad,fade,chromakey,despill
+  #
+  # transpose, hflip, vflip and rotate are autorotate's: fftools inserts
+  # them itself for any source with a display matrix (portrait phone video,
+  # EXIF-rotated JPEGs), and fails with AVERROR_BUG when they are missing.
+  # configure normally selects them for the ffmpeg program, but this build
+  # uses --disable-programs and compiles fftools by hand, so they must be
+  # named here.
+  --enable-filter=scale,zscale,crop,select,aselect,setpts,asetpts,setparams,fps,format,aformat,tonemap,aresample,anull,null,trim,atrim,color,setsar,overlay,colorchannelmixer,adelay,afade,volume,amix,apad,fade,chromakey,despill,transpose,hflip,vflip,rotate
   # aom is built encoder-only now (dav1d decodes av1 and ffmpeg prefers
   # it), so the libaom decoder wrapper has no library behind it
   --disable-decoder=libaom_av1
