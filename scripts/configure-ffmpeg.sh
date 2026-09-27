@@ -30,7 +30,11 @@ FLAGS=(
   --disable-encoders
   --enable-encoder=aac,png,libwebp,libx264,libx265,libaom_av1,libsvtav1,libvpx_vp9,opus
   --disable-muxers
-  --enable-muxer=mp4,mov,image2,webm
+  # matroska rides along with webm: matroskaenc.c compiles its
+  # BlockAdditionMapping writer only under CONFIG_MATROSKA_MUXER, and
+  # without it a webm with vp9 alpha gets its MaxBlockAdditionID patched
+  # over the start of the video TrackEntry (a corrupt file)
+  --enable-muxer=mp4,mov,image2,webm,matroska
   --disable-filters
   # named by videoFilters()/audioTrimFilter(): setparams select setpts crop
   # scale zscale format tonemap fps aselect asetpts. The rest are inserted
